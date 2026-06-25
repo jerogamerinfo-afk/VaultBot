@@ -5,3 +5,4 @@ npm-debug.log
 .env.txt
 config.json
 node_modules
+.DS_Store
