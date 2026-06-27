@@ -7,20 +7,20 @@ const {
   Partials
 } = require("discord.js");
 
+const express = require("express");
 const fs = require("fs");
 const path = require("path");
 const db = require("croxydb");
-const express = require("express");
 
 console.log("🚀 Iniciando VaultBot PRO...");
 
-// =====================
-// KEEP ALIVE (Render)
-// =====================
+// ==========================
+// EXPRESS (Render)
+// ==========================
 const app = express();
 
 app.get("/", (req, res) => {
-  res.send("VaultBot PRO is running 🚀");
+  res.send("VaultBot PRO está funcionando.");
 });
 
 const PORT = process.env.PORT || 3000;
@@ -29,9 +29,9 @@ app.listen(PORT, () => {
   console.log(`🌐 Keep-alive server running on port ${PORT}`);
 });
 
-// =====================
-// CLIENTE DISCORD
-// =====================
+// ==========================
+// CLIENTE
+// ==========================
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
@@ -42,12 +42,12 @@ const client = new Client({
   partials: [Partials.Channel]
 });
 
-// 💾 DATABASE
 client.db = db;
-
-// 📦 COMANDOS
 client.commands = new Collection();
 
+// ==========================
+// CARGAR COMANDOS
+// ==========================
 const commandsPath = path.join(__dirname, "commands");
 
 if (fs.existsSync(commandsPath)) {
@@ -58,11 +58,10 @@ if (fs.existsSync(commandsPath)) {
 
     if (!fs.statSync(folderPath).isDirectory()) continue;
 
-    const files = fs.readdirSync(folderPath).filter(f => f.endsWith(".js"));
+    const files = fs.readdirSync(folderPath).filter(file => file.endsWith(".js"));
 
     for (const file of files) {
-      const filePath = path.join(folderPath, file);
-      const command = require(filePath);
+      const command = require(path.join(folderPath, file));
 
       if (command?.data?.name && command?.execute) {
         client.commands.set(command.data.name, command);
@@ -72,15 +71,16 @@ if (fs.existsSync(commandsPath)) {
   }
 }
 
-// 🎧 EVENTOS
+// ==========================
+// CARGAR EVENTOS
+// ==========================
 const eventsPath = path.join(__dirname, "events");
 
 if (fs.existsSync(eventsPath)) {
-  const eventFiles = fs.readdirSync(eventsPath).filter(f => f.endsWith(".js"));
+  const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith(".js"));
 
   for (const file of eventFiles) {
-    const filePath = path.join(eventsPath, file);
-    const event = require(filePath);
+    const event = require(path.join(eventsPath, file));
 
     if (!event?.name) continue;
 
@@ -94,7 +94,9 @@ if (fs.existsSync(eventsPath)) {
   }
 }
 
-// ⚡ INTERACTIONS (slash commands)
+// ==========================
+// INTERACCIONES
+// ==========================
 client.on("interactionCreate", async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
 
@@ -109,11 +111,16 @@ client.on("interactionCreate", async (interaction) => {
 
   try {
     await command.execute(interaction, client);
-  } catch (err) {
-    console.error("❌ Error en comando:", err);
+  } catch (error) {
+    console.error("❌ Error ejecutando comando:", error);
 
-    if (!interaction.replied) {
-      interaction.reply({
+    if (!interaction.replied && !interaction.deferred) {
+      await interaction.reply({
+        content: "❌ Ocurrió un error ejecutando el comando.",
+        ephemeral: true
+      });
+    } else {
+      await interaction.followUp({
         content: "❌ Ocurrió un error ejecutando el comando.",
         ephemeral: true
       });
@@ -121,27 +128,49 @@ client.on("interactionCreate", async (interaction) => {
   }
 });
 
-// 🧠 ANTI CRASH SYSTEM
-process.on("unhandledRejection", (err) => {
-  console.error("⚠️ Unhandled Rejection:", err);
+// ==========================
+// DEBUG
+// ==========================
+console.log("Node:", process.version);
+console.log("Discord.js:", require("discord.js").version);
+console.log("Token encontrado:", !!process.env.DISCORD_TOKEN);
+
+client.on("debug", info => {
+  console.log("[DEBUG]", info);
 });
 
-process.on("uncaughtException", (err) => {
-  console.error("⚠️ Uncaught Exception:", err);
+client.on("warn", warning => {
+  console.warn("[WARN]", warning);
 });
 
-// 🟢 READY EVENT (FIXED)
-client.once("clientReady", () => {
-  console.log(`✅ VaultBot online como ${client.user.tag}`);
+client.on("error", error => {
+  console.error("[CLIENT ERROR]", error);
 });
 
-// 🔐 LOGIN
+process.on("unhandledRejection", error => {
+  console.error("⚠️ Unhandled Rejection:", error);
+});
+
+process.on("uncaughtException", error => {
+  console.error("⚠️ Uncaught Exception:", error);
+});
+
+// ==========================
+// READY
+// ==========================
+client.once("clientReady", readyClient => {
+  console.log(`🤖 VaultBot listo como ${readyClient.user.tag}`);
+});
+
+// ==========================
+// LOGIN
+// ==========================
 (async () => {
   try {
     console.log("🚀 Intentando iniciar sesión...");
     await client.login(process.env.DISCORD_TOKEN);
     console.log("✅ Login completado.");
-  } catch (err) {
-    console.error("❌ Error durante login:", err);
+  } catch (error) {
+    console.error("❌ Error durante login:", error);
   }
 })();
