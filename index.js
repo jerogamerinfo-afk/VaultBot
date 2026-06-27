@@ -95,49 +95,11 @@ if (fs.existsSync(eventsPath)) {
 }
 
 // ==========================
-// INTERACCIONES
-// ==========================
-client.on("interactionCreate", async (interaction) => {
-  if (!interaction.isChatInputCommand()) return;
-
-  const command = client.commands.get(interaction.commandName);
-
-  if (!command) {
-    return interaction.reply({
-      content: "❌ Comando no encontrado.",
-      ephemeral: true
-    });
-  }
-
-  try {
-    await command.execute(interaction, client);
-  } catch (error) {
-    console.error("❌ Error ejecutando comando:", error);
-
-    if (!interaction.replied && !interaction.deferred) {
-      await interaction.reply({
-        content: "❌ Ocurrió un error ejecutando el comando.",
-        ephemeral: true
-      });
-    } else {
-      await interaction.followUp({
-        content: "❌ Ocurrió un error ejecutando el comando.",
-        ephemeral: true
-      });
-    }
-  }
-});
-
-// ==========================
 // DEBUG
 // ==========================
 console.log("Node:", process.version);
 console.log("Discord.js:", require("discord.js").version);
 console.log("Token encontrado:", !!process.env.DISCORD_TOKEN);
-
-client.on("debug", info => {
-  console.log("[DEBUG]", info);
-});
 
 client.on("warn", warning => {
   console.warn("[WARN]", warning);

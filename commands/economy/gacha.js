@@ -9,7 +9,7 @@ const cards = [
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName("gacha")
+    .setName("gachafuse")
     .setDescription("🎰 Gacha de cartas"),
 
   async execute(interaction, client) {

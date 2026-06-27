@@ -2,7 +2,7 @@ const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName("profile")
+    .setName("vprofile")
     .setDescription("📊 Ver tu perfil de VaultBot"),
 
   async execute(interaction, client) {
