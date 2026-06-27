@@ -1,19 +1,37 @@
 require("dotenv").config();
 
-const { 
-  Client, 
-  Collection, 
-  GatewayIntentBits, 
-  Partials 
+const {
+  Client,
+  Collection,
+  GatewayIntentBits,
+  Partials
 } = require("discord.js");
 
 const fs = require("fs");
 const path = require("path");
 const db = require("croxydb");
+const express = require("express");
 
 console.log("🚀 Iniciando VaultBot PRO...");
 
-// 🤖 CLIENTE
+// =====================
+// KEEP ALIVE (Render)
+// =====================
+const app = express();
+
+app.get("/", (req, res) => {
+  res.send("VaultBot PRO is running 🚀");
+});
+
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`🌐 Keep-alive server running on port ${PORT}`);
+});
+
+// =====================
+// CLIENTE DISCORD
+// =====================
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
@@ -112,10 +130,10 @@ process.on("uncaughtException", (err) => {
   console.error("⚠️ Uncaught Exception:", err);
 });
 
-// 🟢 READY EVENT
-client.once("ready", () => {
+// 🟢 READY EVENT (FIXED)
+client.once("clientReady", () => {
   console.log(`✅ VaultBot online como ${client.user.tag}`);
 });
 
-// 🔐 LOGIN (PRO)
-client.login(process.env.TOKEN);
+// 🔐 LOGIN
+client.login(process.env.DISCORD_TOKEN);

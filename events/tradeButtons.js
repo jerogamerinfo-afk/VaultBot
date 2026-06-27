@@ -1,5 +1,5 @@
 module.exports = {
-  name: "interactionCreate",
+  name: "tradeButtons",
 
   async execute(interaction, client) {
     if (!interaction.isButton()) return;
