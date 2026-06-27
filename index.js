@@ -136,8 +136,12 @@ client.once("clientReady", () => {
 });
 
 // 🔐 LOGIN
-console.log("🔑 Token encontrado:", !!process.env.DISCORD_TOKEN);
-
-client.login(process.env.DISCORD_TOKEN)
-  .then(() => console.log("✅ Login enviado a Discord"))
-  .catch(err => console.error("❌ Error al iniciar sesión:", err));
+(async () => {
+  try {
+    console.log("🚀 Intentando iniciar sesión...");
+    await client.login(process.env.DISCORD_TOKEN);
+    console.log("✅ Login completado.");
+  } catch (err) {
+    console.error("❌ Error durante login:", err);
+  }
+})();
