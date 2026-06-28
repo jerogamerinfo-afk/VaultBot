@@ -12,10 +12,10 @@ const fs = require("fs");
 const path = require("path");
 const db = require("croxydb");
 
-console.log("🚀 Iniciando VaultBot PRO...");
+console.log("🚀 Iniciando VaultBot PRO (TEST CRÍTICO)...");
 
 // ==========================
-// EXPRESS (Render)
+// EXPRESS (Render keep-alive)
 // ==========================
 const app = express();
 
@@ -30,7 +30,7 @@ app.listen(PORT, () => {
 });
 
 // ==========================
-// CLIENTE
+// CLIENTE DISCORD
 // ==========================
 const client = new Client({
   intents: [
@@ -46,7 +46,30 @@ client.db = db;
 client.commands = new Collection();
 
 // ==========================
-// CARGAR COMANDOS
+// DEBUG DISCORD (CRÍTICO)
+// ==========================
+client.on("debug", (info) => {
+  console.log("🔍 DEBUG:", info);
+});
+
+client.on("warn", (info) => {
+  console.log("⚠️ WARN:", info);
+});
+
+client.on("error", (error) => {
+  console.error("❌ CLIENT ERROR:", error);
+});
+
+process.on("unhandledRejection", (error) => {
+  console.error("⚠️ UNHANDLED REJECTION:", error);
+});
+
+process.on("uncaughtException", (error) => {
+  console.error("⚠️ UNCAUGHT EXCEPTION:", error);
+});
+
+// ==========================
+// CARGA DE COMANDOS
 // ==========================
 const commandsPath = path.join(__dirname, "commands");
 
@@ -72,7 +95,7 @@ if (fs.existsSync(commandsPath)) {
 }
 
 // ==========================
-// CARGAR EVENTOS
+// CARGA DE EVENTOS
 // ==========================
 const eventsPath = path.join(__dirname, "events");
 
@@ -85,54 +108,31 @@ if (fs.existsSync(eventsPath)) {
     if (!event?.name) continue;
 
     if (event.once) {
-      client.once(event.name, (...args) => event.execute(...args, client));
-    } else {
-      client.on(event.name, (...args) => event.execute(...args, client));
-    }
-
+  client.once(event.name, (...args) => event.execute(...args));
+} else {
+  client.on(event.name, (...args) => event.execute(...args));
+}
     console.log(`🎧 Evento cargado: ${event.name}`);
   }
 }
 
 // ==========================
-// DEBUG
+// READY EVENT (CORRECTO)
 // ==========================
-console.log("Node:", process.version);
-console.log("Discord.js:", require("discord.js").version);
-console.log("Token encontrado:", !!process.env.DISCORD_TOKEN);
-
-client.on("warn", warning => {
-  console.warn("[WARN]", warning);
-});
-
-client.on("error", error => {
-  console.error("[CLIENT ERROR]", error);
-});
-
-process.on("unhandledRejection", error => {
-  console.error("⚠️ Unhandled Rejection:", error);
-});
-
-process.on("uncaughtException", error => {
-  console.error("⚠️ Uncaught Exception:", error);
-});
-
-// ==========================
-// READY
-// ==========================
-client.once("clientReady", readyClient => {
+client.once("ready", (readyClient) => {
   console.log(`🤖 VaultBot listo como ${readyClient.user.tag}`);
 });
 
 // ==========================
-// LOGIN
+// LOGIN TEST CRÍTICO
 // ==========================
-(async () => {
-  try {
-    console.log("🚀 Intentando iniciar sesión...");
-    await client.login(process.env.DISCORD_TOKEN);
-    console.log("✅ Login completado.");
-  } catch (error) {
-    console.error("❌ Error durante login:", error);
-  }
-})();
+console.log("🚀 Intentando login...");
+
+client.login(process.env.DISCORD_TOKEN)
+  .then(() => {
+    console.log("✅ LOGIN RESUELTO (Discord aceptó el token)");
+  })
+  .catch((err) => {
+    console.error("❌ LOGIN ERROR DETECTADO:");
+    console.error(err);
+  });

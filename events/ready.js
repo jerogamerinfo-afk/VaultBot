@@ -1,14 +1,8 @@
-const economyTick = require("./economyTick");
-
 module.exports = {
-  name: "clientReady",
+  name: "ready",
   once: true,
 
   execute(client) {
-
     console.log(`🤖 VaultBot listo como ${client.user.tag}`);
-
-    economyTick(client);
-
   }
 };
