@@ -11,7 +11,7 @@ const express = require("express");
 const fs = require("fs");
 const path = require("path");
 const db = require("croxydb");
-
+const https = require("https");
 console.log("🚀 Iniciando VaultBot PRO (TEST CRÍTICO)...");
 
 // ==========================
@@ -116,6 +116,24 @@ if (fs.existsSync(eventsPath)) {
   }
 }
 
+// ==========================
+// TEST DE CONEXIÓN A DISCORD
+// ==========================
+https.get("https://discord.com/api/v10/gateway", (res) => {
+  console.log("🌐 Gateway HTTP:", res.statusCode);
+
+  let data = "";
+
+  res.on("data", (chunk) => {
+    data += chunk;
+  });
+
+  res.on("end", () => {
+    console.log("🌐 Gateway respuesta:", data);
+  });
+}).on("error", (err) => {
+  console.error("❌ Gateway ERROR:", err);
+});
 
 // ==========================
 // LOGIN TEST CRÍTICO
