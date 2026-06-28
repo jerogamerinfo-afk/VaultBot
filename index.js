@@ -116,12 +116,6 @@ if (fs.existsSync(eventsPath)) {
   }
 }
 
-// ==========================
-// READY EVENT (CORRECTO)
-// ==========================
-client.once("ready", (readyClient) => {
-  console.log(`🤖 VaultBot listo como ${readyClient.user.tag}`);
-});
 
 // ==========================
 // LOGIN TEST CRÍTICO
