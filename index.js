@@ -129,7 +129,8 @@ if (fs.existsSync(eventsPath)) {
 // LOGIN TEST CRÍTICO
 // ==========================
 console.log("🚀 Intentando login...");
-
+console.log("Token existe:", !!process.env.DISCORD_TOKEN);
+console.log("Longitud:", process.env.DISCORD_TOKEN?.length);
 client.login(process.env.DISCORD_TOKEN)
   .then(() => {
     console.log("✅ LOGIN RESUELTO (Discord aceptó el token)");
